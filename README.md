@@ -27,3 +27,9 @@ no one yet... waiting for the ones that will help me to get a decent cart
 
 ## License ##
 Do what you want with it, I'm happy that you can use this small module, and if you use it, just let me know and if you can improve it, just sent me a pull request :)
+
+## Some Module Images ##
+
+![module closed](https://img.skitch.com/20120911-jfa9tq92ifp79ayisxqy3a8sbe.png "module closed")
+![module opened](https://img.skitch.com/20120911-7fyfbjn6t24jgj2h49dbc1peu.png "module opened")
+![module opened with the form visible](https://img.skitch.com/20120911-q2x4cxy1f267jwbrxpg8w7ujhn.png "module opened with the form visible")
