@@ -1,0 +1,7 @@
+---
+Name: dostoreroutes
+After: framework/routes#coreroutes
+---
+Director:
+  rules:
+    'store//$Action/$ID/$OtherID': 'DOCart'
