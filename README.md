@@ -33,3 +33,5 @@ Do what you want with it, I'm happy that you can use this small module, and if y
 ![module closed](https://img.skitch.com/20120911-jfa9tq92ifp79ayisxqy3a8sbe.png "module closed")
 ![module opened](https://img.skitch.com/20120911-7fyfbjn6t24jgj2h49dbc1peu.png "module opened")
 ![module opened with the form visible](https://img.skitch.com/20120911-q2x4cxy1f267jwbrxpg8w7ujhn.png "module opened with the form visible")
+![email you get from the module](https://img.skitch.com/20120911-ged75k479uaxtbh6wp68ye4xxw.png "email you get from the module")
+
