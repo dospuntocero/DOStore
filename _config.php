@@ -2,4 +2,6 @@
 
 Object::add_extension('DOArticle','Shoppable');
 Object::add_extension('ContentController','DOStoreExtension');
-Object::add_extension('Member','MemberDecorator');
+Object::add_extension('Member','Customer');
+Object::add_extension('SiteConfig','DOStoreconfig');
+LeftAndMain::require_css('DOStore/css/AdminIcon.css');

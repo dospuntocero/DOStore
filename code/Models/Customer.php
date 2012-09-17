@@ -1,6 +1,6 @@
 <?php
 
-class MemberDecorator extends DataExtension
+class Customer extends DataExtension
 {
 	/** //--// **/
 

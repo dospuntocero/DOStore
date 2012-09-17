@@ -17,6 +17,7 @@ class DOCart extends Page_Controller{
 	public static $allowed_actions = array (
 		'cart',
 		'checkout',
+		'success',
 		'cartclear',
 		'deleteitem',
 		'addtocart',
@@ -35,8 +36,6 @@ class DOCart extends Page_Controller{
 	public function setCartSession($message){
 		Session::set('StoreCart', $message);
 	}
-	
-
 
 	// ===============================================================
 	// = Handles the adition of new Objects to our Cart through Ajax =
@@ -198,6 +197,7 @@ class DOCart extends Page_Controller{
 
 	function SendCartByEmail($data) {
 
+		$sc = SiteConfig::current_site_config();
 		// ===============================================
 		// = get the cart and items for sending by email =
 		// ===============================================
@@ -207,45 +207,103 @@ class DOCart extends Page_Controller{
 		))->first();
 		$items = $cart->Items();
 
-		// ==================
-		// = set email data =
-		// ==================
-		
-		$From = $data['Name'] ."<". $data['Email'].">";
-		$To = "im@god.cl";
-		$Subject = _t('DOCart.NEWBUY',"New purchase from our store");
-		$email = new Email($From, $To, $Subject);
+
+	// ==================================================
+	// = Creates the order that will store the purchase =
+	// ==================================================
+
+	$order = new Order();
+	
+	$order->PaymentMethod = "Deposit";
+	$order->Items = $items;
+	$order->Status = "Unpaid";
+
+	// ======================================================
+	// = Creates the customer in the members database, for  =
+	// = future references or better version of this module =
+	// ======================================================
+
+	$email = Convert::raw2sql($data['Email']);
+	$customer = Member::get()->filter("Email =.".$email)->first();
+
+	if($customer){
+		$order->Client = $customer;
+	}
+	else{
+		$member = new Member();
+		$form->saveInto($member);
+		$group = Group::get()->filter("Code == 'customers'");
+		$member->write();
+		$member->Groups()->add($group);
+		$member = $this->Member;
+	}
+
+	// ===================
+	// = saves the order =
+	// ===================
+	
+	$order->write();
+
+	// =================================
+	// = set email data for site owner =
+	// =================================
+
+		$FromOwner = $data['Email'];
+		$ToOwner = $sc->DOStoreMailTo;
+		$SubjectOwner = _t('DOCart.NEWBUY',"New purchase from our store");
+		$emailOwner = new Email($FromOwner, $ToOwner, $SubjectOwner);
 		
 		// = set the template =
-		$email->setTemplate('CartEmail');
+		$emailOwner->setTemplate('CartEmail');
 
 		// = populate template =
-		$email->populateTemplate(
+		$emailOwner->populateTemplate(
 			array(
 				"Name" => $data['Name'],
 				"Email" => $data['Email'],
 				'Items' => $items,
-				"Cart" => $cart,
+				"Order" => $cart
+			)
+		);
+
+	// ===================================
+	// = set email data for the customer =
+	// ===================================
+		
+		$FromCustomer = $sc->DOStoreMailTo;
+		$ToCustomer = $data['Email'];
+		$SubjectCustomer = _t('DOCart.PURCHASETHANKYOU',"Thank you for your purchase");
+		$emailCustomer = new Email($FromCustomer, $ToCustomer, $SubjectCustomer);
+		
+		// = set the template =
+		$emailCustomer->setTemplate('CartEmailCustomer');
+
+		// = populate template =
+		$emailCustomer->populateTemplate(
+			array(
+				"Name" => $data['Name'],
+				"Email" => $data['Email'],
+				'Items' => $items,
 				"Order" => $cart,
+				"DepositInformation" => $sc->DOStoreDepositInstructions
 			)
 		);
 
 		// = send mail =
-		if ($email->send()) {
+		if ($emailOwner->send() && $emailCustomer->send()) {
 			Controller::curr()->redirect(Director::baseURL(). $this->URLSegment . "/success");
 		}else{
 			Controller::curr()->redirect(Director::baseURL(). $this->URLSegment . "/error");
 		}
 	}
 
-
 	public function error(){
 		return $this->httpError(500);
 	}
 
 	public function success(){
-		$renderedContent = $this->renderWith('Page', array('Content' => _t('DOCart.THANKS',"Thanks for your purchase")));
+		$this->cartclear();
+		$renderedContent = $this->renderWith('DOCart_success');
 		return $renderedContent;
 	}
-	
 }

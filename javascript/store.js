@@ -118,6 +118,7 @@
 // ==============================================	
 
 	function showcart(){
+		$('body').append("<div id='Cart'></div>");
 		$.get('store/showcart', function(data) {
 			$('#Cart').html(data);
 			if ($.cookie('cartDisplay') == "big"){
