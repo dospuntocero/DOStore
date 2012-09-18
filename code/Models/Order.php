@@ -16,10 +16,6 @@ class Order extends DataObject{
 		'ID' => 'Order ID',
 	);
 
-	static $has_one = array(
-		'Client' => 'Member',
-	);
-
 	static $has_many = array(
 		'Items' => 'OrderItem'
 	);

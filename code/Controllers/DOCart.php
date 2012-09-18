@@ -22,8 +22,9 @@ class DOCart extends Page_Controller{
 		'deleteitem',
 		'addtocart',
 		'showcart',
-		'SendCartByEmail'
-		);
+		'SendCartByEmail',
+		'getSalesSummary'
+	);
 
 	// ===========================================================
 	// = session related functions. getting and setting the cart =
@@ -37,16 +38,22 @@ class DOCart extends Page_Controller{
 		Session::set('StoreCart', $message);
 	}
 
+
+	public function getCurrentCart(){
+		$c = $this->CartSession;
+		$cart = Order::get()->filter(array(
+			"ClientIdentifier" => $c
+		))->first();
+		return $cart;
+	}
+
+
 	// ===============================================================
 	// = Handles the adition of new Objects to our Cart through Ajax =
 	// ===============================================================
 
 	public function addtocart(){
-		$c = $this->CartSession;
-		$cart = Order::get()->filter(array(
-			"ClientIdentifier" => $c
-		))->first();
-
+		$cart = $this->getCurrentCart();
 		if($cart){
 			//If this user has a cart, we add a new item
 			$this->CreateCartItem($cart, $_REQUEST);
@@ -95,10 +102,7 @@ class DOCart extends Page_Controller{
 	// ===============
 
 	public function deleteitem(){
-		$c = $this->CartSession;
-		$cart = Order::get()->filter(array(
-			"ClientIdentifier" => $c
-		))->first();
+		$cart = $this->getCurrentCart();
 		$item = OrderItem::get()->filter(array(
 			"OrderID" => $cart->ID,
 			"ShoppableID" => $_REQUEST['ID']
@@ -115,11 +119,8 @@ class DOCart extends Page_Controller{
 	// =====================
 
 	public function cartclear(){
-		$c = $this->CartSession;
-		if ($c) {
-			$cart = Order::get()->filter(array(
-				"ClientIdentifier" => $c
-			))->first();
+		$cart = $this->getCurrentCart();
+		if ($cart) {
 			foreach($cart->Items() as $item){
 				$item->delete();
 			}
@@ -172,7 +173,6 @@ class DOCart extends Page_Controller{
 			// ========================================================================
 			return $this->renderWith('CartItems');
 		}
-
 	}
 
 	// =================
@@ -196,53 +196,25 @@ class DOCart extends Page_Controller{
 	}
 
 	function SendCartByEmail($data) {
-
+		
+	// ================================================================
+	// = get siteconfig for the store settings: email, messages, etc. =
+	// ================================================================
 		$sc = SiteConfig::current_site_config();
-		// ===============================================
-		// = get the cart and items for sending by email =
-		// ===============================================
-		$c = $this->CartSession;
-		$cart = Order::get()->filter(array(
-			"ClientIdentifier" => $c
-		))->first();
+		
+	// ===============================================
+	// = get the cart and items for sending by email =
+	// ===============================================
+		$cart = $this->getCurrentCart();
 		$items = $cart->Items();
 
-
-	// ==================================================
-	// = Creates the order that will store the purchase =
-	// ==================================================
-
-	$order = new Order();
-	
-	$order->PaymentMethod = "Deposit";
-	$order->Items = $items;
-	$order->Status = "Unpaid";
-
-	// ======================================================
-	// = Creates the customer in the members database, for  =
-	// = future references or better version of this module =
-	// ======================================================
-
-	$email = Convert::raw2sql($data['Email']);
-	$customer = Member::get()->filter("Email =.".$email)->first();
-
-	if($customer){
-		$order->Client = $customer;
-	}
-	else{
-		$member = new Member();
-		$form->saveInto($member);
-		$group = Group::get()->filter("Code == 'customers'");
-		$member->write();
-		$member->Groups()->add($group);
-		$member = $this->Member;
-	}
-
-	// ===================
-	// = saves the order =
-	// ===================
-	
-	$order->write();
+		$infoOnEmail = array(
+			"Name" => $data['Name'],
+			"Email" => $data['Email'],
+			'Items' => $items,
+			"Order" => $cart,
+			"DepositInformation" => $sc->DOStoreDepositInstructions
+		);
 
 	// =================================
 	// = set email data for site owner =
@@ -253,18 +225,9 @@ class DOCart extends Page_Controller{
 		$SubjectOwner = _t('DOCart.NEWBUY',"New purchase from our store");
 		$emailOwner = new Email($FromOwner, $ToOwner, $SubjectOwner);
 		
-		// = set the template =
+	// = set the template & populate the template =
 		$emailOwner->setTemplate('CartEmail');
-
-		// = populate template =
-		$emailOwner->populateTemplate(
-			array(
-				"Name" => $data['Name'],
-				"Email" => $data['Email'],
-				'Items' => $items,
-				"Order" => $cart
-			)
-		);
+		$emailOwner->populateTemplate($infoOnEmail);
 
 	// ===================================
 	// = set email data for the customer =
@@ -275,22 +238,27 @@ class DOCart extends Page_Controller{
 		$SubjectCustomer = _t('DOCart.PURCHASETHANKYOU',"Thank you for your purchase");
 		$emailCustomer = new Email($FromCustomer, $ToCustomer, $SubjectCustomer);
 		
-		// = set the template =
+	// = set the template & populate the template =
 		$emailCustomer->setTemplate('CartEmailCustomer');
+		$emailCustomer->populateTemplate($infoOnEmail);
 
-		// = populate template =
-		$emailCustomer->populateTemplate(
-			array(
-				"Name" => $data['Name'],
-				"Email" => $data['Email'],
-				'Items' => $items,
-				"Order" => $cart,
-				"DepositInformation" => $sc->DOStoreDepositInstructions
-			)
-		);
+	// = send mail =
+		if ($emailOwner->send() && $emailCustomer->send()) {			
 
-		// = send mail =
-		if ($emailOwner->send() && $emailCustomer->send()) {
+	// ==================================================
+	// = Creates the order that will store the purchase =
+	// ==================================================
+
+			$sale = new Sale();
+			$sale->Name = $data["Name"];
+			$sale->Email = $data["Email"];
+			$sale->PaymentMethod = "Deposit";
+			$sale->Status = "Unpaid";
+			$sale->CartBackUp = $this->getSalesSummary($items,$cart);
+			$sale->Total = $cart->Total;
+			$sale->write();
+
+			
 			Controller::curr()->redirect(Director::baseURL(). $this->URLSegment . "/success");
 		}else{
 			Controller::curr()->redirect(Director::baseURL(). $this->URLSegment . "/error");
@@ -305,5 +273,12 @@ class DOCart extends Page_Controller{
 		$this->cartclear();
 		$renderedContent = $this->renderWith('DOCart_success');
 		return $renderedContent;
+	}
+
+	public function getSalesSummary($items,$cart){
+		return $this->customise(array(
+			'Items' => $items, 
+			"Order" => $cart
+		))->renderWith('SalesSummary');
 	}
 }

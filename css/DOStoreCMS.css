@@ -1,0 +1,24 @@
+.icon.icon-16.icon-dostoreadmin { 
+	background: url('/DOStore/images/store.png'); 
+}
+#SalesSummary div.middleColumn table{
+	padding: 0 !important;
+	background: rgba(255,255,255,.9);
+}
+
+#SalesSummary table tbody tr th {
+	font-weight: bold;
+}
+#SalesSummary table tbody tr th,
+#SalesSummary table tbody tr td{
+	padding: 5px 20px;
+}
+#SalesSummary table tbody tr td{
+	border-bottom: 1px solid #eee;
+}
+
+//todo: find a decent way of make this button dissapear.. this has no sense at all
+
+.cms #Form_EditForm_Sale.ss-gridfield > div { margin-bottom: 36px; }
+.cms #Form_EditForm_Sale.ss-gridfield > div.addNewGridFieldButton {display: none; margin-bottom: 12px; }
+.cms #Form_EditForm_Sale.ss-gridfield > div.addNewGridFieldButton:after { content: "."; display: none; height: 0; clear: both; visibility: hidden; }
