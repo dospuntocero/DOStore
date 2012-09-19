@@ -24,6 +24,15 @@ class Sale extends DataObject{
 		"Total" => "Total"
 	);
 
+	// public function getStatusDropdown(){
+	// 			
+	// 	$Status = new DropdownField('Status',_t('Sale.STATUS',"Stataus"),
+	// 		$this->dbObject('Status')->enumValues()
+	// 	);
+	// 	return $Status;
+	// }
+
+
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
 		$fields->addFieldToTab("Root.Main", new ReadonlyField('Name',_t('Sale.NAME',"Name")));
@@ -33,8 +42,9 @@ class Sale extends DataObject{
 		$fields->removeFieldFromTab("Root.Main","Total");
 		return $fields;
 	}
-	//CRUD settings
+	//CRUD settings - this is not working. silverstripe bug?
 //  public function canCreate($member = null) {return false;}
 //  public function canDelete($member = null) {return false;}  
+
 }
 

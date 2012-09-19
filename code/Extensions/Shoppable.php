@@ -7,18 +7,19 @@ class Shoppable extends DataExtension {
 		"ProductAvailable" => "Boolean",
 	);
 
-	
 
 	public function updateCMSFields(FieldList $fields) {
 		$fields->addFieldsToTab("Root.Main", array(
 			new TextField('Price',_t('Shoppable.Price',"Price")),
 			new CheckboxField('ProductAvailable',_t('Shoppable.ProductAvailable',"Is the product available?"))
-		),'Content');
-
+		),"Date");
 		$fields->removeFieldFromTab("Root.Main","Excerpt");
 		$fields->removeFieldFromTab("Root.Main","Date");
-		$fields->removeFieldFromTab("Root","Attachments");
-		$fields->removeFieldFromTab("Root","ExtraImages");
+	}
+
+	public function populateDefaults() {
+		$this->owner->ProductAvailable = 1;
+		parent::populateDefaults();
 	}
 
 	function getI18nPrice(){
