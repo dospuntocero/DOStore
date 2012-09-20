@@ -208,6 +208,9 @@ class DOCart extends Page_Controller{
 		$cart = $this->getCurrentCart();
 		$items = $cart->Items();
 
+	// ====================================================================================
+	// = this is the information the email needs for both the customer and commerce owner =
+	// ====================================================================================
 		$infoOnEmail = array(
 			"Name" => $data['Name'],
 			"Email" => $data['Email'],
@@ -265,6 +268,20 @@ class DOCart extends Page_Controller{
 		}
 	}
 
+// ========================================================================
+// = creates a plain html version of the purchase so you can get a backup =
+// ========================================================================
+	public function getSalesSummary($items,$cart){
+		return $this->customise(array(
+			'Items' => $items, 
+			"Order" => $cart
+		))->renderWith('SalesSummary');
+	}
+	
+// =========================================
+// = success and error pages for the email =
+// =========================================
+	
 	public function error(){
 		return $this->httpError(500);
 	}
@@ -274,11 +291,5 @@ class DOCart extends Page_Controller{
 		$renderedContent = $this->renderWith('DOCart_success');
 		return $renderedContent;
 	}
-
-	public function getSalesSummary($items,$cart){
-		return $this->customise(array(
-			'Items' => $items, 
-			"Order" => $cart
-		))->renderWith('SalesSummary');
-	}
+	
 }

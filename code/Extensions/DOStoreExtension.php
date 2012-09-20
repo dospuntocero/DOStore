@@ -8,4 +8,6 @@ class DOStoreExtension extends Extension {
 		Requirements::javascript("DOStore/javascript/store.js");
 		Requirements::css("DOStore/css/DOStore.css");
 	}
+	
+	
 }

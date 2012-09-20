@@ -8,7 +8,7 @@
 	</div>
 	<% if Items %>
 	<div class="cart-items">
-		<table>
+		<table width="350">
 			<tr>
 				<th>&nbsp;</th>
 				<th style="text-align:center;"><% _t('CartItems.QUANTITY','Qty') %></th>
