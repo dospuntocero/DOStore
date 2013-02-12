@@ -3,7 +3,7 @@
 class Shoppable extends DataExtension {
 
 	static $db = array(
-		'Price' => 'Int',
+		'Price' => 'Double',
 		"ProductAvailable" => "Boolean",
 	);
 
@@ -13,8 +13,6 @@ class Shoppable extends DataExtension {
 			new TextField('Price',_t('Shoppable.Price',"Price")),
 			new CheckboxField('ProductAvailable',_t('Shoppable.ProductAvailable',"Is the product available?"))
 		),"Date");
-		$fields->removeFieldFromTab("Root.Main","Excerpt");
-		$fields->removeFieldFromTab("Root.Main","Date");
 	}
 
 	public function populateDefaults() {

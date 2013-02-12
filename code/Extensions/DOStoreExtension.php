@@ -6,7 +6,7 @@ class DOStoreExtension extends Extension {
 		Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.min.js");
 		Requirements::javascript(THIRDPARTY_DIR."/jquery-cookie/jquery.cookie.js");
 		Requirements::javascript("DOStore/javascript/store.js");
-		Requirements::css("DOStore/css/DOStore.css");
+		Requirements::themedCSS("DOStore");
 	}
 	
 	

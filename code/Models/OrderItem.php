@@ -5,6 +5,9 @@
 	* @author Francisco
 	*/
 class OrderItem extends DataObject{
+  
+  static $item_class = 'DataObjectAsPage';
+	
 	static $db = array(
 		'Quantity' => 'Int',
 	);
@@ -20,7 +23,8 @@ class OrderItem extends DataObject{
 	// =============================
 	
 	public function getItem(){
-		$item = DOArticle::get()->filter(array(
+	  $myClass = $this->Stat('item_class');
+		$item = $myClass::get()->filter(array(
 			"ID" => $this->ShoppableID
 		))->first();
 		return $item;

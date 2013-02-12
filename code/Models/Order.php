@@ -42,7 +42,7 @@ class Order extends DataObject{
 		if (i18n::get_locale() == 'es_ES') {
 			$c = number_format($this->getTotal(), 0, ',', '.');
 		}
-		else if(i18n::get_locale() == 'us_US'){
+		else if(i18n::get_locale() == 'en_US'){
 			$c = number_format($this->getTotal(), 2, '.', '');
 		}
 		return $c;

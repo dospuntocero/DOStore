@@ -14,6 +14,9 @@ class DOCart extends Page_Controller{
 
 	static $url_segment = 'store';
 
+	static $item_class = 'ArticleToSell';
+
+
 	public static $allowed_actions = array (
 		'cart',
 		'checkout',
@@ -84,7 +87,8 @@ class DOCart extends Page_Controller{
 			$item->Quantity = $item->Quantity+1;
 			$item->write();
 		}else{
-			$cartItem = DOArticle::get()->filter(array(
+		  $myClass = $this->Stat('item_class');
+			$cartItem = $myClass::get()->filter(array(
 				"ID" => $_REQUEST['ID']
 			))->first();
 			if ($cartItem) {
@@ -181,7 +185,7 @@ class DOCart extends Page_Controller{
 	function CartForm() {
 	// Create fields
 		$fields = new FieldList(
-			new LiteralField("title","<div>"._t("DOCart.GETDEPOSITINFORMATION","Get Deposit information")."</div>"),
+			new HeaderField("title",_t("DOCart.GETDEPOSITINFORMATION","Get Deposit information"),4),
 			TextField::create('Name')->setTitle(_t('DOCart.NAMEINPUT',"Name <em>*</em>")),
 			EmailField::create("Email")->setTitle(_t('DOCart.EMAIL',"Email address"))->setAttribute('type', 'email')
 		);

@@ -118,7 +118,7 @@
 // ==============================================	
 
 	function showcart(){
-		$('body').append("<div id='Cart'></div>");
+		$("<div id='Cart'></div>").appendTo('#cartHolder');
 		$.get('store/showcart', function(data) {
 			$('#Cart').html(data);
 			if ($.cookie('cartDisplay') == "big"){
