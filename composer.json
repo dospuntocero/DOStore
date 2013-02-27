@@ -1,0 +1,36 @@
+{
+
+    "name": "dospuntocero/dostore",
+
+    "description": "This is a very simple module for adding a cart made from dataobjects on silverstripe 3, it doesnt have payment, just a simple form to send the cart to the site owner.",
+
+    "type": "silverstripe-module",
+
+    "keywords": ["silverstripe", "ecommerce", "store", "cart", "purchases"],
+
+    "license": "BSD-3-Clause",
+
+    "authors": [
+
+    {
+
+        "name": "Dospuntocero",
+
+        "email": "fa@dospuntocero.cl"
+
+    }
+
+    ],
+
+    "require":
+
+    {
+
+        "silverstripe/framework": "3.*",
+
+        "silverstripe/cms": "3.*"
+
+    },
+
+    "version": "1.0.0"
+}
